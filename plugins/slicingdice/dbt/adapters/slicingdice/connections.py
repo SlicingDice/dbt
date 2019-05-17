@@ -99,3 +99,9 @@ class SlicingDiceAdapterConnectionManager(SQLConnectionManager):
     @classmethod
     def get_status(cls, cursor):
         return "SUCCESS {}".format(cursor.rowcount)
+
+    def add_begin_query(self):
+        pass
+
+    def add_commit_query(self):
+        pass

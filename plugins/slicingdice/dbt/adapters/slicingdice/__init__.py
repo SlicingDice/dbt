@@ -1,5 +1,6 @@
 from dbt.adapters.slicingdice.connections import SlicingDiceAdapterConnectionManager
 from dbt.adapters.slicingdice.connections import SlicingDiceAdapterCredentials
+from dbt.adapters.slicingdice.relation import SlicingDiceRelation # noqa
 from dbt.adapters.slicingdice.impl import SlicingDiceAdapterAdapter
 
 from dbt.adapters.base import AdapterPlugin
