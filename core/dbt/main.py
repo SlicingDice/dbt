@@ -150,7 +150,8 @@ def handle_and_check(args):
         outfile=parsed.record_timing_info
     ):
 
-        initialize_config_values(parsed)
+        if parsed.sd_params:
+            initialize_config_values(parsed)
 
         reset_adapters()
 
@@ -690,6 +691,13 @@ def parse_args(args):
         action='store_true',
         help=argparse.SUPPRESS
     )
+
+    p.add_argument(
+        '--slicing-dice-params',
+        action='store',
+        dest='sd_params'
+    )
+
 
     subs = p.add_subparsers(title="Available sub-commands")
 
