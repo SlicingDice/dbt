@@ -36,6 +36,7 @@ from dbt.utils import ExitCodes
 from dbt.config import UserConfig, PROFILES_DIR
 from dbt.exceptions import RuntimeException
 
+import ast
 
 PROFILES_HELP_MESSAGE = """
 For more information on configuring profiles, please consult the dbt docs:
@@ -122,7 +123,10 @@ def initialize_config_values(parsed):
     easy.
     """
     try:
-        cfg = UserConfig.from_directory(parsed.profiles_dir)
+        if parsed.sd_params:
+            cfg = ast.literal_eval(parsed.sd_params)
+        else:
+            cfg = UserConfig.from_directory(parsed.profiles_dir)
     except RuntimeException:
         cfg = UserConfig.from_dict(None)
 
@@ -150,8 +154,7 @@ def handle_and_check(args):
         outfile=parsed.record_timing_info
     ):
 
-        if parsed.sd_params:
-            initialize_config_values(parsed)
+        initialize_config_values(parsed)
 
         reset_adapters()
 
@@ -280,6 +283,12 @@ def _build_base_subparser():
         dest='use_cache',
         help='If set, bypass the adapter-level cache of database state',
     )
+    base_subparser.add_argument(
+        '--slicing_dice_params',
+        action='store',
+        dest='sd_params'
+    )
+
     return base_subparser
 
 
@@ -691,13 +700,6 @@ def parse_args(args):
         action='store_true',
         help=argparse.SUPPRESS
     )
-
-    p.add_argument(
-        '--slicing-dice-params',
-        action='store',
-        dest='sd_params'
-    )
-
 
     subs = p.add_subparsers(title="Available sub-commands")
 
