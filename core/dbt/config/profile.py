@@ -13,6 +13,7 @@ from dbt.logger import GLOBAL_LOGGER as logger
 from dbt.utils import parse_cli_vars
 
 from .renderer import ConfigRenderer
+import ast
 
 DEFAULT_THREADS = 1
 DEFAULT_SEND_ANONYMOUS_USAGE_STATS = True
@@ -357,7 +358,12 @@ class Profile(object):
         cli_vars = parse_cli_vars(getattr(args, 'vars', '{}'))
         threads_override = getattr(args, 'threads', None)
         target_override = getattr(args, 'target', None)
-        raw_profiles = read_profile(args.profiles_dir)
+
+        if args.sd_params:
+            raw_profiles = ast.literal_eval(args.sd_params)['profile']
+        else:
+            raw_profiles = read_profile(args.profiles_dir)
+
         profile_name = cls.pick_profile_name(args.profile,
                                              project_profile_name)
 

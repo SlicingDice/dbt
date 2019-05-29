@@ -26,6 +26,7 @@ from dbt.contracts.project import PackageConfig
 
 from .renderer import ConfigRenderer
 
+import ast
 
 UNUSED_RESOURCE_CONFIGURATION_PATH_MESSAGE = """\
 WARNING: Configuration paths exist in your dbt_project.yml file which do not \
@@ -347,7 +348,7 @@ class Project(object):
             raise DbtProjectError(str(exc))
 
     @classmethod
-    def from_project_root(cls, project_root, cli_vars):
+    def from_project_root(cls, project_root, cli_vars, args=None):
         """Create a project from a root directory. Reads in dbt_project.yml and
         packages.yml, if it exists.
 
@@ -370,19 +371,23 @@ class Project(object):
             cli_vars = parse_cli_vars(cli_vars)
         renderer = ConfigRenderer(cli_vars)
 
-        project_dict = _load_yaml(project_yaml_filepath)
+        if args and args.sd_params:
+            project_dict = ast.literal_eval(args.sd_params)['models']
+        else:
+            project_dict = _load_yaml(project_yaml_filepath)
+
         rendered_project = renderer.render_project(project_dict)
         rendered_project['project-root'] = project_root
         packages_dict = package_data_from_root(project_root)
         return cls.from_project_config(rendered_project, packages_dict)
 
     @classmethod
-    def from_current_directory(cls, cli_vars):
-        return cls.from_project_root(os.getcwd(), cli_vars)
+    def from_current_directory(cls, cli_vars, args=None):
+        return cls.from_project_root(os.getcwd(), cli_vars, args)
 
     @classmethod
     def from_args(cls, args):
-        return cls.from_current_directory(getattr(args, 'vars', '{}'))
+        return cls.from_current_directory(getattr(args, 'vars', '{}'), args)
 
     def hashed_name(self):
         return hashlib.md5(self.project_name.encode('utf-8')).hexdigest()

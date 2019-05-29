@@ -123,10 +123,7 @@ def initialize_config_values(parsed):
     easy.
     """
     try:
-        if parsed.sd_params:
-            cfg = ast.literal_eval(parsed.sd_params)
-        else:
-            cfg = UserConfig.from_directory(parsed.profiles_dir)
+        cfg = UserConfig.from_directory(parsed.profiles_dir)
     except RuntimeException:
         cfg = UserConfig.from_dict(None)
 
