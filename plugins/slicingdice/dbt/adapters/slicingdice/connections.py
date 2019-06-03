@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import time
 
 import pyodbc
 import dbt.exceptions
@@ -88,6 +89,30 @@ class SlicingDiceAdapterConnectionManager(SQLConnectionManager):
             raise dbt.exceptions.FailedToConnectException(str(e))
 
         return connection
+
+    def add_query(self, sql, auto_begin=True, bindings=None,
+                  abridge_sql_log=False):
+        connection = self.get_thread_connection()
+        if auto_begin and connection.transaction_open is False:
+            self.begin()
+
+        logger.debug('Using {} connection "{}".'
+                     .format(self.TYPE, connection.name))
+
+        with self.exception_handler(sql):
+            if abridge_sql_log:
+                logger.debug('On %s: %s....', connection.name, sql[0:512])
+            else:
+                logger.debug('On %s: %s', connection.name, sql)
+            pre = time.time()
+
+            cursor = connection.handle.cursor()
+            cursor.execute(sql)
+
+            logger.debug("SQL status: %s in %0.2f seconds",
+                         self.get_status(cursor), (time.time() - pre))
+
+            return connection, cursor
 
     @classmethod
     def get_credentials(cls, credentials):

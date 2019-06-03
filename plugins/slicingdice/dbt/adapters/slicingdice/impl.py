@@ -1,7 +1,7 @@
 from dbt.adapters.base import available
-from dbt.adapters.sql import SQLAdapter
-from dbt.adapters.slicingdice import SlicingDiceRelation
 from dbt.adapters.slicingdice import SlicingDiceAdapterConnectionManager
+from dbt.adapters.slicingdice import SlicingDiceRelation
+from dbt.adapters.sql import SQLAdapter
 from dbt.logger import GLOBAL_LOGGER as logger
 
 
@@ -45,3 +45,6 @@ class SlicingDiceAdapterAdapter(SQLAdapter):
 
     def drop_relation(self, relation):
         logger.debug(relation)
+
+    def rename_relation(self, from_relation, to_relation):
+        pass
