@@ -36,6 +36,7 @@ from dbt.utils import ExitCodes
 from dbt.config import UserConfig, PROFILES_DIR
 from dbt.exceptions import RuntimeException
 
+import ast
 
 PROFILES_HELP_MESSAGE = """
 For more information on configuring profiles, please consult the dbt docs:
@@ -279,6 +280,12 @@ def _build_base_subparser():
         dest='use_cache',
         help='If set, bypass the adapter-level cache of database state',
     )
+    base_subparser.add_argument(
+        '--slicing_dice_params',
+        action='store',
+        dest='sd_params'
+    )
+
     return base_subparser
 
 
