@@ -323,6 +323,10 @@ def get_nodes_by_tags(nodes, match_tags, resource_type):
     return matched_nodes
 
 
+def get_ephemeral_type(node):
+    return node.get('config', {}).get('ephemeral_type')
+
+
 def md5(string):
     return hashlib.md5(string.encode('utf-8')).hexdigest()
 
