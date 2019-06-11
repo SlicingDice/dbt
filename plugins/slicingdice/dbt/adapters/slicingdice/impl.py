@@ -1,3 +1,6 @@
+import requests
+import dbt.exceptions
+
 from dbt.adapters.base import available
 from dbt.adapters.slicingdice import SlicingDiceAdapterConnectionManager
 from dbt.adapters.slicingdice import SlicingDiceRelation
@@ -44,7 +47,23 @@ class SlicingDiceAdapterAdapter(SQLAdapter):
             type=self.RELATION_TYPES.get(sd_table[3]))
 
     def drop_relation(self, relation):
-        logger.debug(relation)
+        host = self.connections.get_thread_connection().credentials.get('host')
+        database = self.connections.get_thread_connection().credentials.get(
+            'database')
+        host = host + '/v1/dimension'
+
+        relation = relation.name
+        relation = relation.replace("_", "-")
+        relation = relation.replace("--dbt-tmp", "")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": database
+        }
+
+        r = requests.delete(host, json={'api-name': relation}, headers=headers)
+        if r.status_code != 200:
+            raise dbt.exceptions.FailedToConnectException(str(e))
 
     def rename_relation(self, from_relation, to_relation):
         pass
