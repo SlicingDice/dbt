@@ -21,7 +21,6 @@ setup(
 
     description=description,
     long_description=long_description,
-    long_description_content_type='text/markdown',
 
     author="Fishtown Analytics",
     author_email="info@fishtownanalytics.com",
